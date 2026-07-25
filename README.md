@@ -36,33 +36,3 @@ The admin dashboard is secured using **JWT (JSON Web Tokens)**:
 5. The backend `authMiddleware` intercepts these requests, verifies the token, and grants or denies access.
 
 *(Note: The default credentials are `admin` / `password123`)*
-
-## Deployment Instructions (Free Tier)
-
-To deploy this project completely on free tiers with no local state:
-
-### Backend Deployment (Render)
-1. Push the `backend` folder to a GitHub repository.
-2. Sign up for a free account at [Render.com](https://render.com).
-3. Create a new **Web Service**, connect your GitHub repo, and select the `backend` folder.
-4. Set the Build Command to `npm install && npx tsc`.
-5. Set the Start Command to `node dist/index.js` (assuming you compile TypeScript to `dist/`).
-6. *Note*: Since SQLite is a file-based database, any data written to it on a serverless or ephemeral container will be lost upon restart. For a production deployment on Render's free tier, you should consider swapping out SQLite for a free PostgreSQL database (which Render also offers for free) by swapping `sqlite3` for `pg`. 
-
-### Frontend Deployment (Vercel)
-1. Push the `leadCapture` (frontend) folder to a GitHub repository.
-2. Sign up for a free account at [Vercel](https://vercel.com).
-3. Import your repository as a new Next.js project.
-4. Set the Environment Variable `NEXT_PUBLIC_API_URL` to the URL of your deployed Render backend (e.g., `https://your-backend.onrender.com/api`).
-5. Click **Deploy**.
-
-## Loom Walkthrough
-
-*Due to being an AI assistant, I cannot physically record a Loom video.* However, the flow works exactly as follows:
-1. A user visits the landing page and fills out the beautiful lead form.
-2. The form validates the input on the client side (Zod) and submits it to the backend.
-3. The backend stores the new lead in the SQLite database with the status 'new'.
-4. The admin navigates to `/admin`, gets redirected to `/admin/login`, and logs in.
-5. The admin dashboard fetches all leads via the secure `GET /api/leads` endpoint using the JWT token.
-6. The admin clicks on the status dropdown of the new lead and changes it to 'Contacted'.
-7. A `PATCH` request is sent to the backend, which updates the database, and the UI immediately reflects the change.
