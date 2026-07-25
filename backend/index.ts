@@ -10,10 +10,14 @@ app.use(cors());
 app.use(express.json());
 
 // Helper to convert SQLite DATETIME strings (e.g. '2026-07-25 09:17:54') to standard ISO 8601 UTC ('2026-07-25T09:17:54.000Z')
-const formatToISO = (dateStr: string) => {
-  if (!dateStr) return dateStr;
-  if (dateStr.includes('T')) return dateStr; // Already ISO
-  return dateStr.replace(' ', 'T') + '.000Z';
+const formatToISO = (date: any) => {
+  if (!date) return date;
+  if (date instanceof Date) return date.toISOString();
+  if (typeof date === 'string') {
+    if (date.includes('T')) return date;
+    return date.replace(' ', 'T') + '.000Z';
+  }
+  return date;
 };
 
 const mapTimestamps = (obj: any) => {
