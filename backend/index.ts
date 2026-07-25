@@ -79,7 +79,7 @@ app.post('/api/leads', async (req, res) => {
 
 app.get('/api/leads', authMiddleware, async (req, res) => {
   try {
-    const leads = await dbAll('SELECT * FROM leads ORDER BY createdAt DESC');
+    const leads = await dbAll('SELECT * FROM leads ORDER BY "createdAt" DESC');
     res.json({ success: true, data: leads.map(mapTimestamps) });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch leads' });
@@ -105,7 +105,7 @@ app.delete('/api/leads/:id', authMiddleware, async (req, res) => {
     if (result.changes === 0) return res.status(404).json({ error: 'Lead not found' });
     if (lead) {
       await dbRun(
-        'INSERT INTO notifications (title, description, type, leadId) VALUES (?, ?, ?, ?)',
+        'INSERT INTO notifications (title, description, type, "leadId") VALUES (?, ?, ?, ?) RETURNING id',
         ['Lead Deleted', `${lead.name} was removed from the database.`, 'lead_deleted', null]
       );
     }
@@ -135,7 +135,7 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
 
 app.get('/api/dashboard/recent-activity', authMiddleware, async (req, res) => {
   try {
-    const leads: any[] = await dbAll('SELECT * FROM leads ORDER BY createdAt DESC LIMIT 5');
+    const leads: any[] = await dbAll('SELECT * FROM leads ORDER BY "createdAt" DESC LIMIT 5');
     const activities = leads.map(l => ({
       id: l.id,
       type: 'lead_created',
@@ -164,7 +164,7 @@ app.patch('/api/leads/:id/status', authMiddleware, async (req, res) => {
     if (lead) {
       const statusTitle = status.charAt(0).toUpperCase() + status.slice(1);
       await dbRun(
-        'INSERT INTO notifications (title, description, type, leadId) VALUES (?, ?, ?, ?)',
+        'INSERT INTO notifications (title, description, type, "leadId") VALUES (?, ?, ?, ?) RETURNING id',
         ['Lead Updated', `${lead.name}'s status changed to ${statusTitle}.`, 'status_changed', leadId]
       );
     }
@@ -176,7 +176,7 @@ app.patch('/api/leads/:id/status', authMiddleware, async (req, res) => {
 
 app.get('/api/notifications', authMiddleware, async (req, res) => {
   try {
-    const notifications = await dbAll('SELECT * FROM notifications ORDER BY createdAt DESC LIMIT 100');
+    const notifications = await dbAll('SELECT * FROM notifications ORDER BY "createdAt" DESC LIMIT 100');
     // Convert boolean 0/1 back to boolean for frontend and map timestamps
     const mapped = notifications.map((n: any) => mapTimestamps({
       ...n,
