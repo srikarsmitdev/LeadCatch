@@ -59,7 +59,7 @@ export function NotificationCenter() {
     refetchInterval: 10000, // Poll every 10s for real-time feel
   });
 
-  const notifications = (notificationsResponse?.data || []).filter((n: Notification) => n.type === 'lead_created');
+  const notifications = notificationsResponse?.data || [];
   const unreadCount = notifications.filter((n: Notification) => !n.read).length;
 
   const filteredNotifications = useMemo(() => {

@@ -72,7 +72,7 @@ app.post('/api/leads', async (req, res) => {
       [name, email, budget, message, 'new']
     );
     await dbRun(
-      'INSERT INTO notifications (title, description, type, leadId) VALUES (?, ?, ?, ?)',
+      'INSERT INTO notifications (title, description, type, "leadId") VALUES (?, ?, ?, ?)',
       ['New Lead', `${name} submitted a new inquiry.`, 'lead_created', result.lastID]
     );
     res.status(201).json({ success: true, message: 'Lead created' });
